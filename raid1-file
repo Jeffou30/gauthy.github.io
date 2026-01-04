@@ -1,0 +1,29 @@
+Pour mettre en place une solution RAID 1 sur un serveur Ubuntu avec trois disques : 
+- Un disque de données
+- Un disque de copie de données
+- Un disque hot spare (en cas de défaillance des deux disques précédents)
+
+#Pour créer son volume RAID 1 voici la première commande :
+- sudo mdadm --create /dev/md0 --level=raid1 --raid-devices=2 /dev/sdb /dev/sdc --spare-devices=1 /dev/sdd
+
+#Pour fixer les paramères de notre RAID il faut ajouter cette ligne dans le fichier suivant /etc/mdadm/mdadm.conf
+- ARRAY /dev/md0 level=raid1 num-devices=2 spares=1 UUID=mettre son UUID ici devices=/dev/sdb, /dev/sdc, /dev/sdd
+
+#Pour connaitre son UUID il faut éxécuter la commande suivante : 
+- sudo mdadm --query --detail /dev/md0
+
+#Pour finir pour que les modifications soient pris en compte il faut lancer cette commande : 
+- sudo update-initramfs -u 
+
+#Nous pouvons enfin formater et utiliser notre volume RAID 1 comme une partition quelconque : 
+- sudo mkfs -t ext4 /dev/md0 #Formatage
+- sudo mount -t ext4 /dev/md0 /var/data1 #Montage
+- sudo touch /var/data1/mon_premier_fichier #Création d'un fichier 
+
+#Reconstruire son RAID suite à un défaut de disque, pour cela nous allons simuler la perte du disque /dev/sdb et vérifier que le disque 
+/dev/sdd prend bien le relai automatiquement 
+- sudo mdadm --manage /dev/md0 --fail /dev/sdb
+- sudo mdadm --query --detail /dev/md
+- sudo mdadm --manage /dev/md0 --remove /dev/sdb
+- sudo mdadm --manage /dev/md0 --add /dev/sdb
+- sudo mdadm --query --detail /dev/md0
