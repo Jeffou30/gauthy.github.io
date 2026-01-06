@@ -1,0 +1,11 @@
+#Création de la BDD
+CREATE DATABASE beesafe
+
+#Création de l'utilisateur et accoder uniquement depuis le serveur web
+CREATE USER 'beesafe_adm'@'192.168.1.78' IDENTIFIED BY 'motdepasse';
+
+-- Droits (pour un admin applicatif)
+GRANT ALL PRIVILEGES ON beesafe.* TO 'beesafe_adm'@'192.168.1.78';
+FLUSH PRIVILEGES;
+
+EXIT;
