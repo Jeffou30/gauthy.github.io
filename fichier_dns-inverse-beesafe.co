@@ -1,0 +1,12 @@
+  GNU nano 7.2                                                                                         /etc/bind/db.inverse.www.beesafe.co
+$TTL 86400
+@   IN  SOA ns1.beesafe.co. admin.beesafe.co. (
+        2026010501 ; Serial (à incrémenter à chaque modif)
+        3600       ; Refresh
+        1800       ; Retry
+        604800     ; Expire
+        86400 )    ; Minimum
+
+    IN  NS  ns1.beesafe.co.
+
+78  IN  PTR www.beesafe.co.
