@@ -1,0 +1,61 @@
+#Fichier de mon vhost sur mon serveur web apache 
+
+<VirtualHost *:80>
+        ServerName www.beesafe.co
+        ServerAlias beesafe.co
+        ServerAdmin webmaster@beesafe.co
+
+        Redirect permanent / https://www.beesafe.co/
+
+        <IfModule mod_rewrite.c>
+                RewriteEngine On
+                RewriteCond %{HTTPS} !=on
+                 RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,QSA,R=permanent]
+         </IfModule>
+</Virtualhost>
+
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+        # The ServerName directive sets the request scheme, hostname and port that
+        # the server uses to identify itself. This is used when creating
+        # redirection URLs. In the context of virtual hosts, the ServerName
+        # specifies what hostname must appear in the request's Host: header to
+        # match this virtual host. For the default virtual host (this file) this
+        # value is not decisive as it is used as a last resort host regardless.
+        # However, you must set it for any further virtual host explicitly.
+        ServerName www.beesafe.co
+        ServerAlias beesafe.co
+
+        ServerAdmin webmaster@beesafe.co
+        DocumentRoot /var/www/html/www.beesafe.co
+         ProxyPassMatch ^/(.*\.php(/.*)?)$ unix:/run/php/php8.3-fpm.sock|fcgi://localhost/var/www/html/www.beesafe.co
+
+
+        #On active le chiffrement HTTPS
+        SSLEngine On
+        SSLCertificateFile /etc/apache2/ssl/web.crt
+        SSLCertificateKeyFile /etc/apache2/ssl/web.key
+
+
+        # Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
+        # error, crit, alert, emerg.
+        # It is also possible to configure the loglevel for particular
+        # modules, e.g.
+        #LogLevel info ssl:warn
+
+        ErrorLog ${APACHE_LOG_DIR}/www.beesafe.co-error.log
+        CustomLog ${APACHE_LOG_DIR}/www.beesafe.co-access.log combined
+
+        <Directory /var/www/html/www.beesafe.co>
+                Options All
+                AllowOverride None
+        </Directory>
+
+        <Directory /var/www/html/www.beesafe.co/top_secret>
+                AuthType Basic
+                AuthName "Accès restreint aux utilisateurs authentifiés"
+                AuthBasicProvider file
+                AuthUserFile "/etc/apache2/passwords"
+                Require ip 192.168.1.78
+                Require valid-user
+        </Directory>
